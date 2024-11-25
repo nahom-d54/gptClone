@@ -1,3 +1,5 @@
+const axios = require("axios");
+
 const proxyRequest = async (request) => {
   try {
     const { messages, temperature } = request;

@@ -1,5 +1,4 @@
 const express = require("express");
-const User = require("../models/User");
 const userController = require("../controllers/user");
 const asyncHandler = require("../utils/asyncHandler");
 
@@ -7,7 +6,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /user/login:
+ * /api/user/login:
  *   post:
  *     tags:
  *       - User
@@ -38,7 +37,7 @@ router.post("/login", asyncHandler(userController.authenticate));
 
 /**
  * @swagger
- * /user/register:
+ * /api/user/register:
  *   post:
  *     tags:
  *       - User
@@ -69,7 +68,7 @@ router.post("/register", asyncHandler(userController.register));
 
 /**
  * @swagger
- * /user/resend-verification-email:
+ * /api/user/resend-verification-email:
  *   get:
  *     tags:
  *       - User
