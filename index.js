@@ -8,7 +8,6 @@ const { initiatePassport } = require("./src/config/passportConfig");
 const cors = require("cors");
 const { initializeNodeMailer } = require("./src/config/nodeMailer");
 const APIError = require("./src/errors/apiError");
-const initializeRedis = require("./src/config/redis");
 
 initiatePassport();
 
@@ -24,7 +23,7 @@ app.use((req, res, next) => {
 });
 app.use(express.json());
 app.use("/api-docs", swaggerRouter);
-app.use("/", router);
+app.use("/api", router);
 
 app.use((err, req, res, next) => {
   if (err instanceof APIError) {
