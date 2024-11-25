@@ -3,13 +3,13 @@ const {
   pagination,
 } = require("../../utils/helperFunctions");
 
-const getChatMessages = async (chatId, page = 1, limit = 10) => {
+const getChatMessages = async function (chatId, page = 1, limit = 10) {
   const paginationValues = getPaginationValues(page, limit);
 
-  const result = await this.aggrigate([
+  const result = await this.aggregate([
     {
       $match: {
-        chatId: chatId,
+        chat: chatId,
       },
     },
     {
@@ -23,4 +23,8 @@ const getChatMessages = async (chatId, page = 1, limit = 10) => {
   return result;
 };
 
-module.exports = { getChatMessages };
+const insertMessage = async function (msg) {
+  await this.create({ message: msg.message, chat: msg.chat });
+};
+
+module.exports = { getChatMessages, insertMessage };
