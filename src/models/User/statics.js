@@ -9,18 +9,14 @@ const { sendVerificationEmail } = require('../../config/nodeMailer');
  * @returns {Promise<User>} - The saved user
  */
 const createUser = async function(userObject) {
-    const { name, email, password } = userObject;
+    const { firstName, lastName, username, email, password } = userObject;
     const findUser = await this.findOne({ email });
     if (findUser) {
         return {
             error: "User already exists"
         }
     }
-    const newUser = new this({
-        name,
-        email,
-        password
-    })
+    const newUser = new this({ firstName, lastName, username, email, password })
     newUser.lastVerificationEmailSent = Date.now();
     
     await newUser.save();
@@ -32,7 +28,7 @@ const createUser = async function(userObject) {
     const token = generateJsonWebToken(cleanUser, '1h', EMAIL_JWT_SECRET);
 
 
-    await sendVerificationEmail(`${process.env.APP_URL}user/verify/${token}?email=${this.email}`, this.email);
+    //await sendVerificationEmail(`${process.env.APP_URL}user/verify/${token}?email=${this.email}`, this.email);
     
     return cleanUser
 }
