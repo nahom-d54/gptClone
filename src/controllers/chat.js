@@ -3,8 +3,9 @@ const ChatHistory = require("../models/ChatHistory");
 const { proxyRequest } = require("../utils/aiProxy");
 
 const generateAiResponse = async (req, res) => {
-  const { message, chatId } = req.body;
-  const chatHistoryObj = await ChatHistory.getOrCreateSingleChatHistory(chatId);
+  const { message, chat } = req.body;
+  const chatHistoryObj = await ChatHistory.getOrCreateSingleChatHistory(chat);
+
   const getChatHistory = await Chat.getChatMessages(chatHistoryObj._id, 1, 5);
 
   const historyMessages = getChatHistory[0].data
@@ -30,16 +31,28 @@ const generateAiResponse = async (req, res) => {
 };
 
 const getChatMessages = async (req, res) => {
-  const { chatId, page, limit } = req.params;
+  const { page, limit } = req.query;
+  const chatId = req.params.chatId;
 
-  const chatHistory = await Chat.getChatMessages(chatId, page, limit);
+  const getChat = await ChatHistory.getChatHistoryByChatId(chatId);
+  if (!getChat) {
+    res.status(404).json({ error: "Chat not found" });
+    return;
+  } else if (getChat.user !== req.user._id) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  const chatHistory = await Chat.getChatMessages(getChat._id, page, limit);
   res.status(200).json(chatHistory);
 };
 
 const getChatHistory = async (req, res) => {
-  const { page, limit } = req.params;
+  const { page, limit } = req.query;
 
-  const chatHistory = await ChatHistory.getChatHistory(page, limit);
+  const userId = req.user._id;
+
+  const chatHistory = await ChatHistory.getChatHistory(userId, page, limit);
   res.status(200).json(chatHistory);
 };
 
