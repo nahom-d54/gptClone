@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const {
   getPaginationValues,
   pagination,
@@ -19,6 +21,10 @@ const getChatMessages = async function (chatId, page = 1, limit = 10) {
     },
     ...pagination(paginationValues.skip, paginationValues.limit),
   ]);
+
+  const r = await this.find({ chat: chatId });
+
+  console.log(r, "static");
 
   return result;
 };
