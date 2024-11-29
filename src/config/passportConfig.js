@@ -39,13 +39,13 @@ const authenticateJWT = (req, res, next) => {
         false
       );
     }
-    if (!user.isVerified) {
-      throw new APIError(
-        errorMessages.userNotVerified,
-        httpStatus.FORBIDDEN,
-        false
-      );
-    }
+    // if (!user.isVerified) {
+    //   throw new APIError(
+    //     errorMessages.userNotVerified,
+    //     httpStatus.FORBIDDEN,
+    //     false
+    //   );
+    // }
     req.user = user;
     next();
   })(req, res, next);
