@@ -4,22 +4,20 @@ const proxyRequest = async (request) => {
   try {
     const { messages, temperature } = request;
 
-    // Send request to OpenAI API
-    const response = await axios.post(
-      process.env.AI_API_URL,
-      {
-        model: "grok-beta",
-        messages,
-        temperature,
-        stream: false,
+    const prompt = {
+      model: "grok-beta",
+      messages,
+      temperature,
+      stream: false,
+    };
+
+    console.log(prompt);
+    const response = await axios.post(process.env.AI_API_URL, prompt, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.AI_API_KEY}`, // Set your API key in .env
       },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.AI_API_KEY}`, // Set your API key in .env
-        },
-      }
-    );
+    });
 
     // Send the response back to the client
     return response.data;
