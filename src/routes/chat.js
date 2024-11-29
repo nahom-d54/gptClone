@@ -98,4 +98,30 @@ router.get("/messages/:chatId", asyncHandler(chatController.getChatMessages));
  */
 router.get("/history", asyncHandler(chatController.getChatHistory));
 
+/**
+ * @swagger
+ * /api/chat/message/{chatId}:
+ *  delete:
+ *   tags:
+ *    - Chat
+ *   summary: Delete chat history
+ *   description: Delete chat history
+ *   parameters:
+ *    - in: path
+ *    name: chatId
+ *    required: true
+ *   schema:
+ *   type: string
+ *   responses:
+ *     200:
+ *      description: Chat history deleted
+ *     500:
+ *      description: Internal Server Error
+ *
+ */
+router.delete(
+  "/message/:chatId",
+  asyncHandler(chatController.deleteChatHistory)
+);
+
 module.exports = router;
