@@ -4,7 +4,13 @@ const { proxyRequest } = require("../utils/aiProxy");
 
 const generateAiResponse = async (req, res) => {
   const { message, chat } = req.body;
-  const chatHistoryObj = await ChatHistory.getOrCreateSingleChatHistory(chat);
+  const userId = req.user._id;
+
+  const chatHistoryObj = await ChatHistory.getOrCreateSingleChatHistory(
+    chat,
+    userId,
+    `${message.slice(0, 21)}...`
+  );
 
   const getChatHistory = await Chat.getChatMessages(chatHistoryObj._id, 1, 5);
 
@@ -30,15 +36,52 @@ const generateAiResponse = async (req, res) => {
   res.status(200).json({ response, chatId: chatHistoryObj._id });
 };
 
+const deleteChatHistory = async (req, res) => {
+  const chatId = req.params.chatId;
+
+  const getChat = await ChatHistory.getChatHistoryByChatId(chatId);
+
+  if (!getChat) {
+    res.status(404).json({ error: "Chat not found" });
+    return;
+  } else if (getChat.user.toString() !== req.user._id.toString()) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  await ChatHistory.deleteChatHistoryByChatId(chatId);
+  await Chat.deleteByChatId(chatId);
+  res.status(200).json({ message: "Chat history deleted" });
+};
+
+const updateChatHistoryTitle = async (req, res) => {
+  const chatId = req.params.chatId;
+  const { title } = req.body;
+
+  const getChat = await ChatHistory.getChatHistoryByChatId(chatId);
+
+  if (!getChat) {
+    res.status(404).json({ error: "Chat not found" });
+    return;
+  } else if (getChat.user.toString() !== req.user._id.toString()) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  await ChatHistory.updateChatHistoryTitle(chatId, title);
+  res.status(200).json({ message: "Chat history title updated" });
+};
+
 const getChatMessages = async (req, res) => {
   const { page, limit } = req.query;
   const chatId = req.params.chatId;
 
   const getChat = await ChatHistory.getChatHistoryByChatId(chatId);
+
   if (!getChat) {
     res.status(404).json({ error: "Chat not found" });
     return;
-  } else if (getChat.user !== req.user._id) {
+  } else if (getChat.user.toString() !== req.user._id.toString()) {
     res.status(401).json({ error: "Unauthorized" });
     return;
   }
@@ -56,4 +99,10 @@ const getChatHistory = async (req, res) => {
   res.status(200).json(chatHistory);
 };
 
-module.exports = { generateAiResponse, getChatMessages, getChatHistory };
+module.exports = {
+  generateAiResponse,
+  getChatMessages,
+  getChatHistory,
+  updateChatHistoryTitle,
+  deleteChatHistory,
+};
