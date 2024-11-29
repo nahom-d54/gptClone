@@ -24,8 +24,6 @@ const getChatMessages = async function (chatId, page = 1, limit = 10) {
 
   const r = await this.find({ chat: chatId });
 
-  console.log(r, "static");
-
   return result;
 };
 
@@ -33,4 +31,8 @@ const insertMessage = async function (msg) {
   await this.create({ message: msg.message, chat: msg.chat });
 };
 
-module.exports = { getChatMessages, insertMessage };
+const deleteByChatId = async function (chatId) {
+  await this.deleteMany({ chat: chatId });
+};
+
+module.exports = { getChatMessages, insertMessage, deleteByChatId };
