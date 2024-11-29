@@ -1,39 +1,58 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 function isNumeric(str) {
-    return !isNaN(str);
+  return !isNaN(str);
 }
 
 const getPaginationValues = (pageNo = 1, size = 10) => {
-    const page = Number.parseInt(pageNo || '1', 10);
-    const limit = Number.parseInt(size || '10', 10);
-    const skip = limit * (page - 1);
-    return { limit, skip };
-  };
+  const page = Number.parseInt(pageNo || "1", 10);
+  const limit = Number.parseInt(size || "10", 10);
+  const skip = limit * (page - 1);
+  return { limit, skip };
+};
 const pagination = (skip = 0, limit = 10) => {
-    return [{
+  return [
+    {
       $facet: {
         data: [{ $skip: skip }, { $limit: limit }],
-        totalCount: [{ $count: 'count' }],
+        totalCount: [{ $count: "count" }],
       },
     },
     {
       $addFields: {
-        totalCount: { $arrayElemAt: ['$totalCount.count', 0] },
+        totalCount: { $arrayElemAt: ["$totalCount.count", 0] },
+        nextPage: {
+          $cond: {
+            if: {
+              $gt: [{ $arrayElemAt: ["$totalCount.count", 0] }, skip + limit],
+            },
+            then: Math.ceil((skip + limit) / limit) + 1,
+            else: null,
+          },
+        },
+        prevPage: {
+          $cond: {
+            if: { $gt: [skip, 0] },
+            then: Math.ceil(skip / limit),
+            else: null,
+          },
+        },
       },
     },
     {
       $project: {
         data: 1,
-        totalCount: { $ifNull: ['$totalCount', 0] },
-        page: 1
+        totalCount: { $ifNull: ["$totalCount", 0] },
+        nextPage: 1,
+        prevPage: 1,
       },
-    }]
-  };
+    },
+  ];
+};
 
-const generateJsonWebToken = (user, expiresIn = '1d', jwt_secret) => {
-    const secret = jwt_secret ? jwt_secret: process.env.JWT_SECRET; 
-    return jwt.sign(user, secret, { expiresIn: expiresIn });
-}
+const generateJsonWebToken = (user, expiresIn = "1d", jwt_secret) => {
+  const secret = jwt_secret ? jwt_secret : process.env.JWT_SECRET;
+  return jwt.sign(user, secret, { expiresIn: expiresIn });
+};
 
 class DateFuncs {
   static initTime = {
@@ -84,8 +103,8 @@ class DateFuncs {
         0,
         0,
         0,
-        0,
-      ),
+        0
+      )
     );
     return convertedDate;
   }
@@ -100,8 +119,8 @@ class DateFuncs {
         23,
         59,
         59,
-        999,
-      ),
+        999
+      )
     );
     return convertedDate;
   }
@@ -116,8 +135,8 @@ class DateFuncs {
         thisDate.getUTCHours(),
         thisDate.getUTCMinutes(),
         thisDate.getUTCSeconds(),
-        thisDate.getUTCMilliseconds(),
-      ),
+        thisDate.getUTCMilliseconds()
+      )
     );
     return hmsDate;
   }
@@ -146,7 +165,7 @@ class DateFuncs {
 
   static timedelta(date, options) {
     let result = this.parseTime(date);
-    if(options.years) {
+    if (options.years) {
       result.setUTCFullYear(result.getUTCFullYear() + options.years);
     }
     if (options.months) {
@@ -165,7 +184,9 @@ class DateFuncs {
       result.setUTCSeconds(result.getUTCSeconds() + options.seconds);
     }
     if (options.milliseconds) {
-      result.setUTCMilliseconds(result.getUTCMilliseconds() + options.milliseconds);
+      result.setUTCMilliseconds(
+        result.getUTCMilliseconds() + options.milliseconds
+      );
     }
 
     return result;
@@ -184,14 +205,20 @@ class DateFuncs {
           thisTime.getUTCHours(),
           thisTime.getUTCMinutes(),
           thisTime.getUTCSeconds(),
-          thisTime.getUTCMilliseconds(),
-        ))
+          thisTime.getUTCMilliseconds()
+        )
+      );
 
       return convertedDate;
-
     }
     return thisDate;
   }
 }
 
-module.exports = { isNumeric, pagination, getPaginationValues, generateJsonWebToken, DateFuncs }
+module.exports = {
+  isNumeric,
+  pagination,
+  getPaginationValues,
+  generateJsonWebToken,
+  DateFuncs,
+};
