@@ -14,7 +14,7 @@ const getChatHistory = async function (userId, page = 1, limit = 10) {
     },
     {
       $sort: {
-        createdAt: 1,
+        createdAt: -1,
       },
     },
     ...pagination(paginationValues.skip, paginationValues.limit),
@@ -24,13 +24,13 @@ const getChatHistory = async function (userId, page = 1, limit = 10) {
 
 const getOrCreateSingleChatHistory = async function (
   chatId,
+  userId,
   title = "Untitled"
 ) {
-  console.log({ chatId });
   const single = await this.findOneAndUpdate(
     { _id: chatId ?? new mongoose.Types.ObjectId() },
     {
-      $setOnInsert: { chatTitle: title },
+      $setOnInsert: { chatTitle: title, user: userId },
     },
     {
       returnOriginal: false,
@@ -45,8 +45,18 @@ const getChatHistoryByChatId = async function (chatId) {
   return result;
 };
 
+const updateChatHistoryTitle = async function (chatId, title) {
+  await this.updateOne({ _id: chatId }, { chatTitle: title });
+};
+
+const deleteChatHistoryByChatId = async function (chatId) {
+  await this.deleteOne({ _id: chatId });
+};
+
 module.exports = {
   getChatHistory,
   getOrCreateSingleChatHistory,
   getChatHistoryByChatId,
+  updateChatHistoryTitle,
+  deleteChatHistoryByChatId,
 };
