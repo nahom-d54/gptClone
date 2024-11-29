@@ -11,7 +11,6 @@ const proxyRequest = async (request) => {
       stream: false,
     };
 
-    console.log(prompt);
     const response = await axios.post(process.env.AI_API_URL, prompt, {
       headers: {
         "Content-Type": "application/json",
