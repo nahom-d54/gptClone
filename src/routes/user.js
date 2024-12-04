@@ -94,5 +94,7 @@ router.get(
   asyncHandler(userController.resendVerificationEmail)
 );
 
+router.post("/change-password", asyncHandler(userController.changePassword));
+
 router.get("/verify/:token", asyncHandler(userController.verifyUser));
 module.exports = router;
