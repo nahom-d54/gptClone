@@ -7,9 +7,6 @@ const bcrypt = require("bcryptjs");
  * @returns {Promise<boolean>} - Whether the password is valid.
  */
 const comparePassword = async function (candidatePassword) {
-  const match = await bcrypt.compare(candidatePassword, this.password);
-
-  console.log(candidatePassword, this.password, match);
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
