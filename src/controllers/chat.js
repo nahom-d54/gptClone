@@ -1,6 +1,7 @@
 const Chat = require("../models/Chat");
 const ChatHistory = require("../models/ChatHistory");
 const { proxyRequest } = require("../utils/aiProxy");
+const OpenAI = require("openai");
 
 const generateAiResponse = async (req, res) => {
   const { message, chat } = req.body;
@@ -22,7 +23,21 @@ const generateAiResponse = async (req, res) => {
     ? [...historyMessages, { role: "user", content: message }]
     : [{ role: "user", content: message }];
 
-  const response = await proxyRequest({ messages, temperature: 0 });
+  const client = new OpenAI({
+    apiKey: process.env.AI_API_KEY,
+    baseURL: process.env.AI_API_URL,
+  });
+
+  const response = await client.chat.completions.create({
+    model: "grok-beta",
+    messages: messages,
+    stream: false,
+  });
+
+  console.log(response);
+
+  //const response = await proxyRequest({ messages, temperature: 0 });
+
   const resObj = response?.choices?.[0]?.message;
   if (!resObj) {
     res.status(500).json({ error: "No response from AI" });
