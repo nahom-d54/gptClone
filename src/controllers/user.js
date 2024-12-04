@@ -41,9 +41,19 @@ const resendVerificationEmail = async (req, res) => {
   res.json(user);
 };
 
+const changePassword = async (req, res) => {
+  const { previousPassword, newPassword } = req.body;
+  const updated = await req.user.changePassword(previousPassword, newPassword);
+
+  res.json({
+    success: "Password Changed Successfully!",
+  });
+};
+
 module.exports = {
   authenticate,
   register,
   verifyUser,
   resendVerificationEmail,
+  changePassword,
 };
