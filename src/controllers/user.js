@@ -43,6 +43,10 @@ const resendVerificationEmail = async (req, res) => {
 
 const changePassword = async (req, res) => {
   const { previousPassword, newPassword } = req.body;
+  if (!req.user) {
+    throw new APIError("Not authenticated !", 401);
+  }
+
   const updated = await req.user.changePassword(previousPassword, newPassword);
 
   res.json({

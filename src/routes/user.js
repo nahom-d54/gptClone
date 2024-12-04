@@ -1,6 +1,7 @@
 const express = require("express");
 const userController = require("../controllers/user");
 const asyncHandler = require("../utils/asyncHandler");
+const { authenticateJWT } = require("../config/passportConfig");
 
 const router = express.Router();
 
@@ -94,7 +95,11 @@ router.get(
   asyncHandler(userController.resendVerificationEmail)
 );
 
-router.post("/change-password", asyncHandler(userController.changePassword));
+router.post(
+  "/change-password",
+  authenticateJWT,
+  asyncHandler(userController.changePassword)
+);
 
 router.get("/verify/:token", asyncHandler(userController.verifyUser));
 module.exports = router;
