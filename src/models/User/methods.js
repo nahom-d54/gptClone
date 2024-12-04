@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+const APIError = require("../../errors/apiError");
 
 /**
  * Compare a candidate password to the user's password.
@@ -11,8 +12,10 @@ const comparePassword = async function (candidatePassword) {
 };
 
 const changePassword = async function (previousPassword, newPassword) {
-  if (!this.comparePassword(previousPassword)) {
-    throw new Error("Invalid password");
+  const validPassword = await this.comparePassword(previousPassword);
+  console.log({ validPassword });
+  if (!validPassword) {
+    throw new APIError("Invalid password", 400);
   }
   this.password = newPassword;
   return await this.save();
