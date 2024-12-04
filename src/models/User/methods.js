@@ -13,7 +13,7 @@ const comparePassword = async function (candidatePassword) {
 
 const changePassword = async function (previousPassword, newPassword) {
   const validPassword = await this.comparePassword(previousPassword);
-  console.log({ validPassword });
+
   if (!validPassword) {
     throw new APIError("Invalid password", 400);
   }
